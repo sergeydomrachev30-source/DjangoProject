@@ -1,0 +1,27 @@
+{% extends 'library/base.html' %}
+{% block title %}Список книг{% endblock %}
+
+{% block content %}
+{% include 'library/header.html' %}
+
+<!-- Блок динамического приветствия пользователя -->
+<div class="mb-4 mt-3">
+    {% if user.is_authenticated %}
+        <p class="lead">Добро пожаловать, <strong>{{ user.username }}</strong>!</p>
+    {% else %}
+        <p class="lead">Добро пожаловать! Пожалуйста, <a href="{% url 'users:login' %}">войдите</a> или <a href="{% url 'users:register' %}">зарегистрируйтесь</a>.</p>
+    {% endif %}
+</div>
+
+<h2>Список книг</h2>
+<ul class="list-group">
+{% for book in books %}
+    <!-- Добавили класс list-group-item-action -->
+    <a href="{% url 'library:book_detail' book.pk %}" class="list-group-item list-group-item-action">
+        <strong>{{ book.title }}</strong> -
+        {{ book.publication_date|date:"d M Y" }} -
+        {{ book.author.first_name }} {{ book.author.last_name }}
+    </a>
+{% endfor %}
+</ul>
+{% endblock %}

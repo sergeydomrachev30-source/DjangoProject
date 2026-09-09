@@ -1,0 +1,28 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Детали книги{% endblock %}
+
+{% block content %}
+<h2>{{ book.title }}</h2>
+<p>Автор: {{ book.author }}</p>
+<p>Автор: {{ book.author.first_name }} {{ book.author.last_name }}</p>
+<p>Дата публикации: {{ book.publication_date|date:"d M Y" }}</p>
+<p>Средний рейтинг: {{ average_rating }}</p>
+<p>Популярная: {{ is_popular|yesno:"Да,Нет" }}</p>
+<a href="{% url 'library:books_list' %}" class="btn btn-primary">Назад к списку книг</a>
+
+{% if "library.can_review_book" in perms %}
+<form action="{% url 'library:review_book' book.id %}" method="post">
+    {% csrf_token %}
+    <textarea name="review" placeholder="Напишите рецензию"></textarea>
+    <button type="submit">Рецензировать</button>
+</form>
+{% endif %}
+
+{% if "library.can_recommend_book" in perms %}
+<form action="{% url 'library:recommend_book' book.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Рекомендовать</button>
+</form>
+{% endif %}
+{% endblock %}

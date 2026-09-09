@@ -1,0 +1,19 @@
+{% extends 'library/base.html' %}
+
+{% block title %}Форма для книги{% endblock %}
+
+{% block content %}
+{% include 'library/header.html' %}
+
+<!-- Заголовок сам меняется: Добавить или Редактировать -->
+<h2>{% if object.pk %}Редактировать книгу{% else %}Добавить книгу{% endif %}</h2>
+
+<form method="post"> <!-- Обязательно добавили method="post" -->
+    {% csrf_token %}
+    {{ form.non_field.errors }}
+    {{ form.as_p }} <!-- Исправили точку: form.as_p вместо form_as.p -->
+
+    <button type="submit" class="btn btn-success">Сохранить</button>
+    <a href="{% url 'library:books_list' %}" class="btn btn-secondary">Отменить</a>
+</form>
+{% endblock %}

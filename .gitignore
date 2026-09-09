@@ -1,0 +1,24 @@
+# Django секреты и окружение
+.env
+*.env
+
+# Виртуальное окружение
+venv/
+.venv/
+env/
+ENV/
+
+# Кэш Python
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# База данных (если локальная sqlite)
+*.sqlite3
+
+# Настройки PyCharm
+.idea/
+
+# Статика и медиа (если собираются локально)
+media/
+staticfiles/

@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма MyModel</title>
+    <!-- 2. ИСПОЛЬЗУЕМ ТЕГ СТАТИКИ ДЛЯ CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+<div class="container mt-4"> <!-- Добавил mt-4 для отступа сверху -->
+    <h1 class="mb-4">{{ mymodel.name }}</h1>
+    <p class="lead">{{ mymodel.description }}</p>
+    <p><strong>Создано:</strong> {{ mymodel.created_at }}</p>
+    <p><strong>Обновлено:</strong> {{ mymodel.updated_at }}</p>
+    
+    <!-- 3. ДОБАВИМ КНОПКУ НАЗАД (как на видео) -->
+    <a href="{% url 'students:mymodel_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+</div>
+
+<!-- 4. ИСПОЛЬЗУЕМ ТЕГ СТАТИКИ ДЛЯ JS -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends 'students/base.html' %}
+
+{% block title %}Список студентов{% endblock %}
+
+{% block content %}
+{% include 'students/header.html' %}
+<h2>Список студентов</h2>
+<ul class="list-group">
+    {% for student in students %}
+    <li class="list-group-item">
+        <p class="mb-0">{{ student.first_name }} {{ student.last_name }} — {{ student.get_year_display }}</p>
+        {% if perms.students.can_promote_student %}
+        <a href="{% url 'promote_student' student.id %}">Перевести</a>
+        {% endif %}
+        {% if user.has_perm "students.can_expel_student" %}
+        <a href="{% url 'expel_student' student.id %}">Исключить</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
