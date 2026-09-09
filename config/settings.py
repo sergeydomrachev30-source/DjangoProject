@@ -1,9 +1,8 @@
-from pathlib import Path
-
-from django.conf.global_settings import CACHES
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
+# Загрузка переменных окружения
 load_dotenv(override=True)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,6 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True if os.getenv('DEBUG') == "True" else False
 
+# Разрешаем доступ со всех хостов для Docker и облачного сервера
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -36,7 +36,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Настройки путей конфигурации (указывают строго на вашу папку config)
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 TEMPLATES = [
     {
@@ -53,8 +55,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
+# Конфигурация базы данных PostgreSQL для Docker
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -82,16 +83,15 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 USE_L10N = True
-
 USE_TZ = True
 
+# Настройки статических файлов (необходимы для сборщика Nginx)
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
@@ -100,11 +100,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
-
 LOGIN_REDIRECT_URL = 'library:books_list'
-
 LOGIN_URL = 'users:login'
 
+# Настройки отправки почты
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
@@ -114,10 +113,10 @@ EMAIL_HOST_USER = 'ruturta@yandex.ru'
 EMAIL_HOST_PASSWORD = 'yifxjhqcjzywaenh'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# Подключение к Redis по имени сервиса внутри сети Docker
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',
+        'LOCATION': 'redis://redis:6379/1',
     }
 }
-
