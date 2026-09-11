@@ -1,6 +1,5 @@
 from django.urls import path
 from django.views.generic import RedirectView  # Импортируем редирект
-from . import views
 from .views import (
     BooksListView,
     BookCreateView,

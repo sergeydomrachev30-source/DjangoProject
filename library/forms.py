@@ -1,6 +1,5 @@
 from django import forms
 from .models import Author, Book
-from django.core.exceptions import ValidationError
 
 
 class AuthorForm(forms.ModelForm):

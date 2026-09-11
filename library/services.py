@@ -1,6 +1,4 @@
-from django.db.models import Avg
-
-from .models import Book, Review
+from .models import Review
 
 
 class BookService:

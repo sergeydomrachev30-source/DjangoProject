@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -28,7 +27,8 @@ class PromoteStudentView(LoginRequiredMixin, View):
         if not request.user.has_perm("students.can_promote_students"):
             return HttpResponseForbidden("У вас нет прав для перевода студента")
 
-        student.year = next_year(student.year)
+        # ИСПРАВЛЕНО: Вместо несуществующей функции увеличиваем курс математически
+        student.year = int(student.year) + 1
         student.save()
 
         return redirect("students:student_list")
