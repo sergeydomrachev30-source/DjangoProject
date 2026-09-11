@@ -95,6 +95,9 @@ jobs:
           
           # Подключаемся к серверу и выполняем команды через sudo без зависаний терминала
           ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa_protected ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+            # Гарантируем, что файл .env существует на сервере, чтобы docker run не падал
+            touch /home/${{ secrets.SSH_USER }}/.env && \
+            
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
             sudo docker stop myapp || true && \
             sudo docker rm myapp || true && \
