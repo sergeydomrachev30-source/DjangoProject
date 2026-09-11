@@ -90,16 +90,14 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa_protected
           chmod 600 ~/.ssh/id_rsa_protected
           
-          # Самый главный шаг: снимаем пароль с ключа прямо в памяти виртуальной машины,
-          # используя сохраненный пароль из GitHub Secrets
+          # Снимаем пароль с ключа прямо в памяти виртуальной машины, используя секрет SSH_PASSPHRASE
           ssh-keygen -p -P "${{ secrets.SSH_PASSPHRASE }}" -N "" -f ~/.ssh/id_rsa_protected
           
-          # Теперь подключаемся к серверу абсолютно стандартным и чистым ключом без пароля,
-          # который выполнит команду за доли секунды и завершит сессию без зависаний
+          # Подключаемся к серверу и выполняем команды через sudo без зависаний терминала
           ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa_protected ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
-            docker stop myapp || true && \
-            docker rm myapp || true && \
-            docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
-            docker exec myapp python manage.py migrate --noinput
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
+            sudo docker stop myapp || true && \
+            sudo docker rm myapp || true && \
+            sudo docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
+            sudo docker exec myapp python manage.py migrate --noinput
           "
