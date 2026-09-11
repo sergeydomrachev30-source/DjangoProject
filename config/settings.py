@@ -1,4 +1,5 @@
 import os
+import sys  # Импортируем sys для проверки режима тестирования
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -67,6 +68,19 @@ DATABASES = {
     }
 }
 
+# Проверка: если запущены тесты, используем локальную базу SQLite
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'test_db.sqlite3',
+    }
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -103,14 +117,14 @@ AUTH_USER_MODEL = 'users.CustomUser'
 LOGIN_REDIRECT_URL = 'library:books_list'
 LOGIN_URL = 'users:login'
 
-# Настройки отправки почты
+# Настройки отправки почты (все секреты скрыты в переменные окружения)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'ruturta@yandex.ru'
-EMAIL_HOST_PASSWORD = 'yifxjhqcjzywaenh'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Подключение к Redis по имени сервиса внутри сети Docker
@@ -120,3 +134,15 @@ CACHES = {
         'LOCATION': 'redis://redis:6379/1',
     }
 }
+# Проверка: если запущены тесты, используем локальную базу SQLite
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'test_db.sqlite3',
+    }
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
