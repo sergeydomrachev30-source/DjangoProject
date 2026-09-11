@@ -78,17 +78,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    steps: # Добавили пропущенный блок steps
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-        env:
-          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-
-      - name: Deploy to Server
+    steps:
+      - name: Deploy to Server via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          # Устанавливаем утилиту sshpass для автоматического ввода пароля от ключа
+          sudo apt-get update && sudo apt-get install -y sshpass
+          
+          # Создаем временный файл ключа внутри виртуальной машины GitHub
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Подключаемся с автоматической передачей пароля ключа через sshpass
+          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
             docker stop myapp || true
             docker rm myapp || true
