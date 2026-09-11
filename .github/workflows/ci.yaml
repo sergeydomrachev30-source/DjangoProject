@@ -83,16 +83,20 @@ jobs:
     steps:
       - name: Deploy to Server via SSH
         run: |
-          # Устанавливаем утилиту для автоматической авторизации
-          sudo apt-get update && sudo apt-get install -y sshpass
-          
-          # Создаем временную директорию и сохраняем приватный SSH-ключ
+          # Создаем временную директорию для ключа
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           
-          # Быстрое и безопасное подключение одной строкой без зависания терминала
-          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+          # Записываем зашифрованный ключ во временный файл
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa_protected
+          chmod 600 ~/.ssh/id_rsa_protected
+          
+          # Самый главный шаг: снимаем пароль с ключа прямо в памяти виртуальной машины,
+          # используя сохраненный пароль из GitHub Secrets
+          ssh-keygen -p -P "${{ secrets.SSH_PASSPHRASE }}" -N "" -f ~/.ssh/id_rsa_protected
+          
+          # Теперь подключаемся к серверу абсолютно стандартным и чистым ключом без пароля,
+          # который выполнит команду за доли секунды и завершит сессию без зависаний
+          ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa_protected ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
             docker stop myapp || true && \
             docker rm myapp || true && \
