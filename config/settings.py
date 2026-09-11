@@ -8,7 +8,9 @@ load_dotenv(override=True)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-secret-key-for-github-actions')
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-fallback-secret-key-for-github-actions"
+)
 
 DEBUG = True if os.getenv("DEBUG") == "True" else False
 
