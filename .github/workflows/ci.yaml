@@ -20,10 +20,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 black
 
-      # Сначала проверяем, что код отформатирован с помощью Black
+      # Проверяем, что код отформатирован по правилам Black
       - name: Run Black code formatter check
         run: black --check .
 
+      # Проверяем код на соответствие стандартам PEP 8 (исключения берутся из .flake8)
       - name: Run Flake8
         run: flake8 .
 
@@ -53,6 +54,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Запускаем ваши обновленные тесты с SQLite и InMemory кэшем
       - name: Run tests
         run: python manage.py test
 
@@ -74,26 +76,26 @@ jobs:
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
 
-  # 4. Четвертая работа: Деплой на ваш сервер
+  # 4. Четвертая работа: Деплой на ваш удаленный сервер
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Deploy to Server via SSH
         run: |
-          # Устанавливаем утилиту sshpass для автоматического ввода пароля от ключа
+          # Устанавливаем утилиту для автоматической авторизации
           sudo apt-get update && sudo apt-get install -y sshpass
           
-          # Создаем временный файл ключа внутри виртуальной машины GitHub
+          # Создаем временную директорию и сохраняем приватный SSH-ключ
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
-          # Подключаемся с автоматической передачей пароля ключа через sshpass
-          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+          # Быстрое и безопасное подключение одной строкой без зависания терминала
+          sshpass -p "${{ secrets.SSH_PASSPHRASE }}" ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
+            docker stop myapp || true && \
+            docker rm myapp || true && \
+            docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
             docker exec myapp python manage.py migrate --noinput
-          EOF
+          "
