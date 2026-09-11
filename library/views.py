@@ -21,14 +21,16 @@ class ReviewBookView(LoginRequiredMixin, View):
     def post(self, request, pk):
         book = get_object_or_404(Book, pk=pk)
 
-        if not request.user.has_perm('library.can_review_book'):
-            return HttpResponseForbidden('You do not have permission to review this book')
+        if not request.user.has_perm("library.can_review_book"):
+            return HttpResponseForbidden(
+                "You do not have permission to review this book"
+            )
 
-        book.review = request.POST.get('review')
+        book.review = request.POST.get("review")
         book.save()
 
         # Изменили book_id=book_id на pk=pk
-        return redirect('library:book_detail', pk=pk)
+        return redirect("library:book_detail", pk=pk)
 
 
 class RecommendBookView(LoginRequiredMixin, View):
@@ -36,48 +38,50 @@ class RecommendBookView(LoginRequiredMixin, View):
     def post(self, request, pk):
         book = get_object_or_404(Book, pk=pk)
 
-        if not request.user.has_perm('library.can_recommend_book'):
-            return HttpResponseForbidden('You do not have permission to recommend this book')
+        if not request.user.has_perm("library.can_recommend_book"):
+            return HttpResponseForbidden(
+                "You do not have permission to recommend this book"
+            )
 
         book.recommend = True
         book.save()
 
         # Изменили book_id=book_id на pk=pk
-        return redirect('library:book_detail', pk=pk)
+        return redirect("library:book_detail", pk=pk)
 
 
 class AuthorListView(ListView):
     model = Author
-    template_name = 'library/authors_list.html'
-    context_object_name = 'authors'
+    template_name = "library/authors_list.html"
+    context_object_name = "authors"
 
     def get_queryset(self):
-        queryset = cache.get('authors_queryset')
+        queryset = cache.get("authors_queryset")
         if not queryset:
             queryset = super().get_queryset()
-            cache.set('authors_queryset', queryset, 60 * 15)
+            cache.set("authors_queryset", queryset, 60 * 15)
         return queryset
 
 
 class AuthorCreateView(CreateView):
     model = Author
     form_class = AuthorForm
-    template_name = 'library/author_form.html'
+    template_name = "library/author_form.html"
     success_url = reverse_lazy("library:books_list")
 
 
 class AuthorUpdateView(UpdateView):
     model = Author
     form_class = AuthorForm
-    template_name = 'library/author_form.html'
+    template_name = "library/author_form.html"
     success_url = reverse_lazy("library:books_list")
 
 
-@method_decorator(cache_page(60 * 15), name='dispatch')
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class BooksListView(LoginRequiredMixin, ListView):
     model = Book
-    template_name = 'library/books_list.html'
-    context_object_name = 'books'
+    template_name = "library/books_list.html"
+    context_object_name = "books"
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -87,36 +91,38 @@ class BooksListView(LoginRequiredMixin, ListView):
 class BookCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Book
     form_class = BookForm
-    template_name = 'library/book_form.html'
+    template_name = "library/book_form.html"
     success_url = reverse_lazy("library:books_list")
-    permission_required = 'library.add_book'
+    permission_required = "library.add_book"
 
 
 class BookDetailView(LoginRequiredMixin, DetailView):
     model = Book
-    template_name = 'library/book_detail.html'
-    context_object_name = 'book'
+    template_name = "library/book_detail.html"
+    context_object_name = "book"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['author_book_count'] = Book.objects.filter(author=self.object.author).count()
+        context["author_book_count"] = Book.objects.filter(
+            author=self.object.author
+        ).count()
 
         book_id = self.object.id
-        context['average_rating'] = BookService.calculate_average_rating(book_id)
-        context['is_popular'] = BookService.is_popular(book_id)
+        context["average_rating"] = BookService.calculate_average_rating(book_id)
+        context["is_popular"] = BookService.is_popular(book_id)
         return context
 
 
 class BookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Book
     form_class = BookForm
-    template_name = 'library/book_form.html'
+    template_name = "library/book_form.html"
     success_url = reverse_lazy("library:books_list")
-    permission_required = 'library.change_book'
+    permission_required = "library.change_book"
 
 
 class BookDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Book
-    template_name = 'library/book_confirm_delete.html'
+    template_name = "library/book_confirm_delete.html"
     success_url = reverse_lazy("library:books_list")
-    permission_required = 'library.delete_book'
+    permission_required = "library.delete_book"

@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('students', '0004_student_email_student_enrollment_date'),
+        ("students", "0004_student_email_student_enrollment_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='student',
-            name='enrollment_date',
-            field=models.DateField(default=django.utils.timezone.now, verbose_name='Дата зачисления'),
+            model_name="student",
+            name="enrollment_date",
+            field=models.DateField(
+                default=django.utils.timezone.now, verbose_name="Дата зачисления"
+            ),
         ),
     ]

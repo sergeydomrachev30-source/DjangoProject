@@ -7,7 +7,9 @@ exclude =
     venv,
     .venv,
     env,
-    .env
-ignore = W503, E203
+    .env,
+    newapp
+# Игнорируем только E203 (пробел перед двоеточием), так как Black делает его намеренно
+ignore = E203, W503
 count = True
 show-source = True

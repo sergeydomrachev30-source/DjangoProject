@@ -6,5 +6,5 @@ from newapp.apps import NewappConfig
 app_name = NewappConfig.name
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path("", views.home, name="home"),
 ]

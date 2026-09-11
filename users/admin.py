@@ -5,4 +5,4 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    exclude = ('password',)
+    exclude = ("password",)

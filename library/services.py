@@ -18,7 +18,7 @@ class BookService:
         return average_rating
 
     @staticmethod
-    def is_popular(book_id, threshold = 4):
+    def is_popular(book_id, threshold=4):
         average_rating = BookService.calculate_average_rating(book_id)
 
         if average_rating is None:
