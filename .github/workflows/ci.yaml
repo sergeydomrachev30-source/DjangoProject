@@ -101,6 +101,6 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
             sudo docker stop myapp || true && \
             sudo docker rm myapp || true && \
-            sudo docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 80:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
+            sudo docker run -d --name myapp --env-file /home/${{ secrets.SSH_USER }}/.env -p 8080:8000 ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} && \
             sudo docker exec myapp python manage.py migrate --noinput
           "
